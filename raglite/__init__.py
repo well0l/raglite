@@ -3,33 +3,27 @@
 from __future__ import annotations
 
 import os
-
 from flask import Flask
 
-
 def create_app(test_config: dict | None = None) -> Flask:
-    """Crea e configura l'istanza Flask.
-
-    Args:
-        test_config: dizionario di configurazione usato nei test
-                     per sovrascrivere i valori di default.
-                     Se None, viene caricato instance/config.py (se esiste).
-    """
-    app = Flask(__name__, instance_relative_config=True)  # TODO: True o False? Perché?
+    app = Flask(__name__, instance_relative_config=True)
 
     app.config.from_mapping(
-        SECRET_KEY="dev",  # TODO: setta la key per lo sviluppo locale?
-        DATABASE=os.path.join("instance/", "raglite.sqlite"),  # TODO: leggi da app il path giusto
+        SECRET_KEY="dev",
+        DATABASE=os.path.join(app.instance_path, "raglite.sqlite"),
     )
 
     if test_config is None:
-        app.config.from_pyfile("config.py", silent=True)  # TODO: specifica il file di config; perché silent=True?
+        app.config.from_pyfile("config.py", silent=True)
     else:
-        app.config.update(test_config)  # TODO: il dizionario test_config?
+        app.config.update(test_config)
 
-    os.makedirs(app.instance_path, exist_ok=True)  # TODO: usa l'attributo di app con il path di instance/
+    os.makedirs(app.instance_path, exist_ok=True)
+
+    from . import db
+    db.init_app(app)
 
     from . import rag
-    app.register_blueprint(rag.bp)  # TODO: registra il blueprint?
+    app.register_blueprint(rag.bp)
 
     return app
