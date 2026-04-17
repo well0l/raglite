@@ -26,3 +26,23 @@ def stats():
         "docs_indexed":       int(docs_row["n"]),
         "embeddings_indexed": int(emb_row["n"]),
     })
+
+@bp.post("/api/ingest")
+def ingest():
+    """Indicizza un documento nella sessione di default."""
+    payload = request.get_json(silent=True) or {}
+    title = (payload.get("title") or "").strip()
+    text = (payload.get("text") or "").strip()
+    
+
+    # 1. Se text è vuoto, restituisci {"error": "text is required"}, 400.
+    # 2. Se title è vuoto, genera un titolo automatico con timestamp UTC.
+    # 3. Recupera dal database l'id della "Default Session".
+    # 4. Se la sessione non esiste, restituisci {"error": "default session not found"}, 500.
+    # 5. Inserisci il document e conserva document_id.
+    # 6. Calcola i chunk usando la configurazione dell'app.
+    # 7. Per ogni chunk:
+    #    - inserisci una riga in chunks
+    #    - calcola il vettore
+    #    - inserisci una riga in embeddings usando l'id reale del chunk appena creato
+    # 8. Fai commit e restituisci title, document_id, chunks_indexed, embeddings_indexed.
