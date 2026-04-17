@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import os
 from flask import Flask
+RAG_CHUNK_SIZE=110
+RAG_CHUNK_OVERLAP=1
 
 def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__, instance_relative_config=True)
